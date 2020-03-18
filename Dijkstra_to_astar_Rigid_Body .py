@@ -13,7 +13,7 @@ import numpy as np
 import cv2 as cv
 import time
 from scipy.spatial import distance
-
+from math import pi,sin,atan
 
 
 
@@ -34,17 +34,15 @@ def boundary_check(i,j):
         return 1
 
 
-
-
-#Obstacle Map
-def obs_map(x,y):
-    circle = ((np.square(x-225))+ (np.square(y-50)) <=np.square(25)+tot)
-    ellipse = (((np.square(x-150))/np.square(40+tot))+((np.square(y-100))/np.square(20+tot)) -1 <=0)
-    rhombus = (x*(-3/5)+y-55-tot<0) and (x*(3/5)+y-325-tot<0) and (x*(-3/5)+y-25+tot>0) and (x*(3/5)+y-295+tot > 0)
-    rectangle = ((200-y) - (1.73)*x + 135+tot > 0 and (200-y) + (0.58)*x - 96.35-tot  <= 0 and (200-y) - (1.73)*x - 15.54-tot<= 0 and (200-y) + (0.58)*x - 84.81+tot >= 0)
-    polygon1 = ((y+13*x-340+tot>0) and x+y-100-tot<0 and y+(-7/5)*x+20>0)#triangle
-    polygon2 = (y-15+tot>0 and (7/5)*x+y-120<0 and y+(-7/5)*x+20<0)#triangle
-    polygon3 = ((7/5)*x+y-120>0 and (-6/5)*x+y+10-tot<0 and (6/5)*x+y-170-tot<0 and (-7/5)*x+y+90+tot>0)#rhombus
+def obs_map_pt(x,y):
+    circle = ((np.square(x-225))+ (np.square(y-50)) <=np.square(25))
+    ellipse = (((np.square(x-150))/np.square(40))+((np.square(y-100))/np.square(20)) -1 <=0)
+    rhombus = (x*(-3/5)+y-55<0) and (x*(3/5)+y-325<0) and (x*(-3/5)+y-25>0) and (x*(3/5)+y-295 > 0)
+    rectangle = ((200-y) - (1.73)*x + 135 > 0 and (200-y) + (0.58)*x - 96.35  <= 0 and (200-y) - (1.73)*x - 15.54 <= 0 and (200-y) + (0.58)*x - 84.81 >= 0)
+    polygon1 = ((y+13*x-340>0) and x+y-100<0 and y+(-7/5)*x+20>0)#triangle1
+    polygon2 = (y-15>0 and (7/5)*x+y-120<0 and y+(-7/5)*x+20<0)#triangle2
+    polygon3 = ((7/5)*x+y-120>0 and (-6/5)*x+y+10<0 and (6/5)*x+y-170<0 and (-7/5)*x+y+90>0)#rhombus
+    
     if circle or ellipse or rhombus or rectangle or polygon1 or polygon2 or polygon3 :
         obj_val = 0
     else:
@@ -53,7 +51,46 @@ def obs_map(x,y):
     return obj_val
 
 
+#Obstacle Map
+def obs_map(x,y):
+    circle = ((np.square(x-225))+ (np.square(y-50)) <=np.square(25+tot))
+    ellipse = (((np.square(x-150))/np.square(40+tot))+((np.square(y-100))/np.square(20+tot)) -1 <=0)
+    rhombus = (x*(-3/5)+y-55-(tot/sin(pi/2 -atan(-3/5)))<0) and (x*(3/5)+y-325-(tot/sin(pi/2 -atan(3/5)))<0) and (x*(-3/5)+y-25+(tot/sin(pi/2 -atan(-3/5)))>0) and (x*(3/5)+y-295+(tot/sin(pi/2 -atan(3/5))) > 0)
+    rectangle = ((200-y) - (1.73)*x + 135+(tot/sin(pi/2 -atan(1.73))) > 0 and (200-y) + (0.58)*x - 96.35-(tot/sin(pi/2 -atan(0.58)))  <= 0 and (200-y) - (1.73)*x - 15.54-(tot/sin(pi/2 -atan(1.73)))<= 0 and (200-y) + (0.58)*x - 84.81+(tot/sin(pi/2 -atan(0.58)))>= 0)
+    polygon1 = ((y+13*x-340+(tot/sin(pi/2 -atan(13)))>0) and x+y-100-(tot/sin(pi/2 -atan(1)))<0 and y+(-7/5)*x+20>0)#triangle
+    polygon2 = (y-15+tot>0 and (7/5)*x+y-120<0 and y+(-7/5)*x+20<0)#triangle
+    polygon3 = ((7/5)*x+y-120>0 and (-6/5)*x+y+10-(tot/sin(pi/2 -atan(-6/5)))<0 and (6/5)*x+y-170-(tot/sin(pi/2 -atan(6/5)))<0 and (-7/5)*x+y+90+(tot/sin(pi/2 -atan(-7/5)))>0)#rhombus
+    if circle or ellipse or rhombus or rectangle or polygon1 or polygon2 or polygon3 :
+        obj_val = 0
+    else:
+        obj_val = 1
+    
+    return obj_val
 
+
+x = 300
+y = 200
+image = np.ones((y,x,3),np.uint8)*255
+
+
+
+for i in range(200):
+    for j in range(300):
+            image[i][j] = (175,175,175)
+
+
+                 
+#Outer edges mapping
+for x in range(300):
+    for y in range(200):
+        if obs_map(x,y)==0:
+                 image[y,x] = 0
+                 
+                 #Outer edges mapping
+for x in range(300):
+    for y in range(200):
+        if obs_map_pt(x,y)==0:
+                 image[y,x] = (255,255,255)
 
 
 parent_list=[]
@@ -64,52 +101,45 @@ for j in range (300):
     parent_list.append(column)
 
 
-
-
 #Getting the start nodes from the user
 x_start = int(input("Please enter start point x coordinate:"))
 y_start = int(input("Please enter start point y coordinate:"))
-y_start = 200 - y_start
+y_start = 199 - y_start
 
 start_obs = obs_map(x_start,y_start)
 start_boundary = boundary_check(x_start,y_start)
 
-
-while(start_obs and start_boundary!=1):
+while(start_obs!=1 or start_boundary!=1):
     print("Incorrect start point! Please enter a valid start point:")
     x_start = int(input("Please enter start point x coordinate:"))
     y_start = int(input("Please enter start point y coordinate:"))
-    
+    y_start = 199 - y_start
     start_obs = obs_map(x_start,y_start)
     start_boundary = boundary_check(x_start,y_start)
-
+ 
 
 start=[x_start,y_start]
-
-
 
 
 #Geting the goal nodes from the user
 x_goal=int(input("Please enter goal point x coordinate:"))
 y_goal=int(input("Please enter goal point y coordinate:"))
-y_goal=200 - y_goal
+y_goal=199 - y_goal
 
 goal_obs=obs_map(x_goal,y_goal)
 goal_boundary=boundary_check(x_goal,y_goal)
 
 
-while(goal_obs and goal_boundary!=1):
+while(goal_obs!=1 or goal_boundary!=1):
     print("Incorrect goal point! Please enter a valid goal point:")
     x_goal=int(input("Please enter another goal point x coordinate:"))
     y_goal=int(input("Please enter another goal point y coordinate:"))
-    
+    y_goal=199 - y_goal
     goal_obs=obs_map(x_goal,y_goal)
     goal_boundary=boundary_check(x_goal,y_goal)
-    
+ 
 
 goal=[x_goal,y_goal]
-
-
 
 
 
@@ -135,7 +165,7 @@ Q=[]
 Q.append([x_start,y_start])
 cost_array[x_start][y_start]=0
 totalcost[x_start][y_start]=0
-
+print(Q)
 # Priority Queue Function
 
 def pop(Q):
@@ -375,72 +405,7 @@ path_find(goal,start)
 
 print('The cost of the shortest path is',cost_array[x_goal,y_goal])
 
-
-#With Radius and Clearence added
-
-def circle(x,y):
-    
-    if ((np.square(x-225))+ (np.square(y-50)) <=np.square(25)+tot):
-        return True
-    else:
-        return False
-
-
-def ellipse(x,y):
-    
-    if (((np.square(x-150))/np.square(40+tot))+((np.square(y-100))/np.square(20+tot)) -1 <=0): 
-        return True
-    else:
-        return False
-    
-def rectangle(x,y):
-    
-    if ((200-y) - (1.73)*x + 135+tot > 0 and (200-y) + (0.58)*x - 96.35-tot  <= 0 and (200-y) - (1.73)*x - 15.54-tot<= 0 and (200-y) + (0.58)*x - 84.81+tot >= 0):
-        return True
-    else:
-        return False
-
-def rhombus(x,y):
-    if (x*(-3/5)+y-55-tot<0) and (x*(3/5)+y-325-tot<0) and (x*(-3/5)+y-25+tot>0) and (x*(3/5)+y-295+tot > 0):
-        return True
-    else:
-        return False
-    
-def polygon1(x,y):#triangle1
-    if ((y+13*x-340+tot>0) and x+y-100-tot<0 and y+(-7/5)*x+20>0):
-        return True
-    else:
-        return False
-
-def polygon2(x,y):#triangle2
-    if (y-15+tot>0 and (7/5)*x+y-120<0 and y+(-7/5)*x+20<0):
-        return True
-    else:
-        return False
-
-def polygon3(x,y):#rhombus
-    if ((7/5)*x+y-120>0 and (-6/5)*x+y+10-tot<0 and (6/5)*x+y-170-tot<0 and (-7/5)*x+y+90+tot>0):
-        return True
-    else:
-        return False
-
-x = 300
-y = 200
-image = np.ones((y,x,3),np.uint8)*255
-
-#Outer edges mapping
-for x in range(300):
-    for y in range(200):
-        if x>=tot and x<=300-tot and y>=tot and y<=200-tot:
-            image[y,x] = (255,255,255)
-        else:
-            image[y,x] = (175,175,175)
-
-for i in range(200):
-    for j in range(300):
-         if circle(j,i) or ellipse(j,i) or rectangle(j,i) or rhombus(j,i) or polygon1(j,i) or polygon2(j,i) or polygon3(j,i) :
-            image[i][j] = 0
-pic=cv.resize(image,None,fx=3,fy=3)
+pic=cv.resize(image,None,fx=2,fy=2)
 
 
 #Showing the graphical output
@@ -449,13 +414,13 @@ cv.circle(image,(int(start[0]),int(start[1])), (1), (0,0,255), -1);
 
 for i in visited_node:
     cv.circle(image,(int(i[0]),int(i[1])), (1), (255,0,0));
-    pic=cv.resize(image,None,fx=3,fy=3)
+    pic=cv.resize(image,None,fx=2,fy=2)
     cv.imshow('map',pic)
     cv.waitKey(1)
 
 for i in path:
     cv.circle(image,(int(i[0]),int(i[1])), (1), (150,50,204));
-    pic=cv.resize(image,None,fx=3,fy=3)
+    pic=cv.resize(image,None,fx=2,fy=2)
     cv.imshow('map',pic)
     cv.waitKey(1)
     
