@@ -13,10 +13,8 @@ The algorithms are run in an obstacle filled environment composed of a rectangle
 
 	Upon the running the code the user is prompted to provide a number of inputs. The sample usecase has been provided below -
 
-	Please enter radius of the robot: -->
-  
+	Please enter radius of the robot:-->
 	1(**then press Enter)
-	
 	
 	Please enter the clearance:-->
 	1(**then press Enter)
