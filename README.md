@@ -1,6 +1,13 @@
 # ENPM-661-Project-3
 Implementation of A* Algorithm for rigid robot in an obstacle workspace
 
+Dependencies:
+cv2
+time
+math
+heapq
+numpy
+
 DESCRIPTION - The python program  to perform A* algorithm for a rigid robot based on user's input.
 The algorithms are run in an obstacle filled environment composed of a rectangle, circle, ellipse,rhombus and a polygon. The algorithm finds the shortest path to goal node from the start node(both user provided) and displays the explored nodes and the path.
 
@@ -9,21 +16,30 @@ The algorithms are run in an obstacle filled environment composed of a rectangle
 	Please enter radius of the robot: -->
   
 	1(**then press Enter)
-	**** for rigid robot enter a non zero radius****
+	
 	
 	Please enter the clearance:-->
 	1(**then press Enter)
 	
+	PLease enter the step size from 1 to 10:-->
+	1(**then press Enter)
+	
 	Please enter start point x coordinate -->
-	5(**press Enter)
+	50(**press Enter)
 
 	Please enter start point y coordinate -->
-	5(**press Enter)
+	30(**press Enter)
+	
+	Please enter start orientation in degrees:-->
+	60(**press Enter)
 	
 	Please enter goal point x coordinate -->
-	295(**press Enter)
+	150(**press Enter)
 	
 	Please enter goal point y coordinate -->
-	195(**press Enter)
+	150(**press Enter)
+	
+	Please enter goal orientation in degrees:-->
+	0(**press Enter)
 	
 	
