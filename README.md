@@ -2,11 +2,11 @@
 Implementation of A* Algorithm for rigid robot in an obstacle workspace
 
 Dependencies:
-cv2
-time
-math
-heapq
-numpy
+	cv2
+	time
+	math
+	heapq
+	numpy
 
 DESCRIPTION - The python program  to perform A* algorithm for a rigid robot based on user's input.
 The algorithms are run in an obstacle filled environment composed of a rectangle, circle, ellipse,rhombus and a polygon. The algorithm finds the shortest path to goal node from the start node(both user provided) and displays the explored nodes and the path.
