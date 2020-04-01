@@ -35,7 +35,7 @@ currentAxis.add_patch(Rectangle((0.25, 4.25), 1.5, 1.5, fill=None, alpha=1))
 currentAxis.add_patch(Rectangle((8.25, 4.25), 1.5, 1.5, fill=None, alpha=1))
 currentAxis.add_patch(Rectangle((2.25, 7.25), 1.5, 1.5, fill=None, alpha=1))
 
-# # plt.grid()
+plt.grid()
 # fig=plt.gcf()
 
 ax.set_aspect('equal')
@@ -51,11 +51,13 @@ def normalize(Node,thresholdDistance=0.01, thresholdAngle=10):
     x = round(x/thresholdDistance)* thresholdDistance
     y = round(y/thresholdDistance)* thresholdDistance
     t = round(t/thresholdAngle) * thresholdAngle
+    print(t)
     x=round(x,4)
     y=round(y,4)
     n=t//360
     t=t-(360*n)
     t=(t/thresholdAngle)
+    print(t)
     return [x,y,int(t)]
 thresholdDistance=0.01  #0.01
 nd=int(1/thresholdDistance)  #100
@@ -103,7 +105,7 @@ def plot_curve(Xi,Yi,Thetai,UL,UR,p):
     dt = 0.2
     Xn=Xi
     Yn=Yi
-    Thetan = math.radians(Thetai)
+    Thetan = math.radians(Thetai*thresholdAngle)
     while t<2:
         t = t + dt
         Xs = Xn
@@ -118,7 +120,7 @@ def plot_curve(Xi,Yi,Thetai,UL,UR,p):
         if(p==True):
           plt.plot([Xs, Xn], [Ys, Yn], color="blue")
         if(p==False):
-          plt.plot([Xs, Xn], [Ys, Yn], color="red")
+          plt.plot([Xs, Xn], [Ys, Yn], color="red",linewidth=5.0)
     Thetan = math.degrees(Thetan)
     return [Xn, Yn, Thetan]
 
@@ -142,7 +144,6 @@ def move_bot(Xi,Yi,Thetai,UL,UR):
         status=boundary_check(Xn,Yn)
         flag=obs_map(Xn,Yn)
         if (status and flag != 1):
-            print(flag)
             return None
         Thetan += (r / L) * (UR - UL) * dt
     Thetan = math.degrees(Thetan)
@@ -159,13 +160,13 @@ def  convergence(a,goal_node):
 # clearance of the robot 
 tot=0.3
 ########  pre init #####################3
-rpm1=5
-rpm2=6
+rpm1=8
+rpm2=10
 x_start = float(1.1)
 y_start = float(1.1)
 theta_start = int(0)
 x_goal=float(5.0)
-y_goal=float(1.5)
+y_goal=float(7.1)
 theta_goal = int(15)
 actions=[[rpm1,0],[0,rpm1],[rpm1,rpm1],[0,rpm2],[rpm2,0],[rpm2,rpm2],[rpm1,rpm2],[rpm2,rpm1]]
 start=normalize([x_start,y_start,theta_start])
@@ -299,19 +300,27 @@ sx=x_start
 sy=y_start
 sz=theta_start
 
-# for action in explored:
-#     x1= plot_curve(action[0][0],action[0][1],action[0][2], action[1][0],action[1][1],p=True)
 
 
-for action in path:
-    x1= plot_curve(sx,sy,sz, action[1][0],action[1][1],p=False)
-    sx=x1[0]
-    sy=x1[1]
-    sz=x1[2]
 
 # for action in path:
-#     x1= move_bot(sx,sy,sz, action[1][0],action[1][1]) 
+#     x1= plot_curve(sx,sy,sz, action[1][0],action[1][1],p=False)
 #     print(x1)
 #     sx=x1[0]
 #     sy=x1[1]
 #     sz=x1[2]
+i=len(path)
+j=len(explored)
+
+for action in explored:
+    if(j>1):
+         x1= plot_curve(action[0][0],action[0][1],action[0][2], action[1][0],action[1][1],p=True)
+    j=j-1
+for action in path:
+    if(i>1):
+     x1= plot_curve(action[0][0],action[0][1],action[0][2], action[1][0],action[1][1],p=False)
+    i=i-1
+print("Time taken to plot")
+print(time.time()-start_time)  
+plt.savefig('A-Star_path.png')
+
